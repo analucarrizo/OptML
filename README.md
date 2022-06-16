@@ -2,7 +2,7 @@
 ## Title: The Art of Hypertuning: A Comparative Analysis of Different Optimization Techniques
 ### Members:
 - Ana Lucia Carrizo, Msc Data Science, EPFL
-- Amine Tourki, Msc Data Science, EPFL
+- Amine Tourki, Msc Robotics, EPFL
 - Mortadha Abderrahim, Msc Data Science, EPFL
 
 ### Description:
