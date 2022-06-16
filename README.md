@@ -6,7 +6,7 @@
 - Mortadha Abderrahim, Msc Data Science, EPFL
 
 ### Description:
-Fine tuning hyperparameters for Deep Neural Networks is one of the most challenging tasks in deep learning. Learning rate tuning has been a major focus and methods like schedulers and learning rate optimizers have been a major success. Over recent years, researchers have shown interest over other parameters such as momentum with optimizers like momentum SGD or Nesterov Accelerated Gradient (NAG). In this project we further explore momentum tuning techniques such as momentum decay with two State-Of-The-Art optimizers: Demon and YellowFin. We compare their performances with already established optimizers like Adam and SGD. We conclude on the performance of momentum tuning techniques and their viability.
+Fine tuning hyperparameters for Deep Neural Networks is one of the most challenging tasks in deep learning. Learning rate tuning has been a major focus and methods like schedulers and learning rate optimizers have been a major success. Over recent years, researchers have shown interest over other parameters such as momentum with optimizers like ADAM, momentum SGD or Nesterov Accelerated Gradient (NAG). In this project we further explore momentum tuning techniques such as momentum decay with two State-Of-The-Art optimizers: Demon and YellowFin. We compare their performances with already established optimizers like Adam and SGD. We conclude on the performance of momentum tuning techniques and their viability.
 
 ### Implementation Details
 To run this project we took advantage of Google Colab's GPUs. To implement the project, one needs to add all files to a Google Drive common folder, and mount said folder in the main notebook. 
