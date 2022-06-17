@@ -124,6 +124,7 @@ def run_best_model_yellowfin(mnist_train, mnist_test, model, config, device):
   nb_epochs = config["epochs"]
   nb_folds = config["folds"]
   accs = [0]*nb_epochs
+  losses = [0]*nb_epochs
 
   for fold in range(nb_folds):
     model.to(device)
@@ -136,14 +137,14 @@ def run_best_model_yellowfin(mnist_train, mnist_test, model, config, device):
     
     for epoch in range(nb_epochs):
       train(model, train_loader, criterion, optimizer, device, config["view_every"])
-      acc = test(model, test_loader, device)
+      acc,loss = test(model, test_loader, device,criterion)
 
       accs[epoch] += acc
-
+      losses[epoch] += loss
       print(f"Epoch {epoch} - accuracy: {acc:.4}")
 
   for i in range(len(accs)):
     accs[i] /= nb_folds
 
   print(f"----- {((time.time() - start_time)/60):.4} minutes")
-  return accs
+  return accs,losses,((time.time() - start_time)/60)

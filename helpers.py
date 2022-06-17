@@ -27,6 +27,7 @@ import torchvision.datasets as datasets
 
 # !pip install CosineAnnealingWithRestartsLR
 from torch.optim import Adam
+from torch.optim import SGD
 from torch.optim.lr_scheduler import LambdaLR
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim.lr_scheduler import LinearLR
@@ -56,8 +57,9 @@ def train(model, data_loader, criterion, optimizer, device, view_every = 500):
             print('Batch {:d} / {:d}: loss = {:.4f}'.format(i+1,len(data_loader),running_loss/view_every))
             running_loss = 0.0
 
-def test(model, data_loader, device):
+def test(model, data_loader, device,criterion):
     correct = 0.0
+    loss_ = 0.0
     total = 0.0
         
     with torch.no_grad():
@@ -67,16 +69,17 @@ def test(model, data_loader, device):
         
         # compute outputs by running images through the network
         outputs = model(images)
-        
+        loss = criterion(outputs, labels)
         # choosing class with highest probability          
         pdf = F.softmax(outputs, dim=1) 
         predicted = pdf.argmax(dim=1)     
 
         correct += (predicted ==  labels).sum()
         total += len(predicted)
-    return correct/total
+        loss_ += loss.item()
+    return correct/total , loss_/total
 
-def run_best_model(mnist_train, mnist_test, model, config, device):
+def run_best_model(mnist_train, mnist_test, model, config, device,sgdm = False,sgd=False):
   train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=64, shuffle=True, pin_memory=torch.cuda.is_available())
   test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=64, shuffle=True, pin_memory = torch.cuda.is_available())
   
@@ -84,29 +87,37 @@ def run_best_model(mnist_train, mnist_test, model, config, device):
   nb_epochs = config["epochs"]
   nb_folds = config["folds"]
   accs = [0]*nb_epochs
+  losses = [0]*nb_epochs
 
   for fold in range(nb_folds):
     model.to(device)
 
     batch_size = config["batch_size"]
     criterion = config["criterion"]()
-    optimizer = config["optimizer"](model.parameters(), lr = config["lr"])
-    scheduler = config["scheduler"](optimizer, **config["scheduler_parameters"])
+    if(sgdm):
+        momentum = config["momentum"]
+        nesterov = config["nesterov"]
+        optimizer = config["optimizer"](model.parameters(), lr = config["lr"],momentum=momentum,nesterov=nesterov)
+    elif(sgd):
+        optimizer = config["optimizer"](model.parameters(), lr = config["lr"])
+    else: 
+        optimizer = config["optimizer"](model.parameters(), lr = config["lr"])
+        scheduler = config["scheduler"](optimizer, **config["scheduler_parameters"])
     
     print(f"------ FOLD {fold + 1} -------")
     
     for epoch in range(nb_epochs):
       train(model, train_loader, criterion, optimizer, device)
-      acc = test(model, test_loader, device)
+      acc,loss = test(model, test_loader, device,criterion)
 
-      accs[epoch] += acc
-
-      scheduler.step()
-
-      print(f"Epoch {epoch}: lr = {scheduler.get_lr()}, test accuracy {acc:.4}")
+      accs[epoch] += acc.item()
+      losses[epoch] += loss
+      if(sgdm==False and sgd == False):
+        scheduler.step()
+        print(f"Epoch {epoch}: lr = {scheduler.get_lr()}, test accuracy {acc:.4}")
 
   for i in range(len(accs)):
     accs[i] /= nb_folds
 
   print(f"----- {((time.time() - start_time)/60):.4} minutes")
-  return accs
+  return accs,losses,((time.time() - start_time)/60)

@@ -73,25 +73,27 @@ def train_demon(model, train_loader, criterion, optimizer, device, view_every, I
 
   # print('Finished Training')
 
-def test_demon(model, test_loader, device):
-  correct = 0
-  total = 0
+def test_demon(model, test_loader, device,criterion):
+  correct = 0.0
+  total = 0.0
+  loss_ = 0.0
   # since we're not training, we don't need to calculate the gradients for our outputs
   with torch.no_grad():
       for data in test_loader:
           images, labels = data[0].to(device), data[1].to(device)
           # calculate outputs by running images through the network 
           outputs = model(images).to(device)
-          
+          loss = criterion(outputs, labels)
           # the class with the highest energy is what we choose as prediction
           pdf = F.softmax(outputs, dim=1) 
           predicted = pdf.argmax(dim=1) 
 
           total += labels.size(0)
           correct += (predicted == labels).sum().item()
+          loss_ += loss.item()
 
   # print(f'Accuracy of the network on the test images: {(100 * correct / total)} %')
-  return correct/total
+  return correct/total, loss_/total
 
 def hyperparameters_demon(mnist_train, model, params, device):
   start_time = time.time()
@@ -171,7 +173,7 @@ def run_best_model_demon(mnist_train, mnist_test, model, config, device):
   nb_epochs = config["epochs"]
   nb_folds = config["folds"]
   accs = [0]*nb_epochs
-
+  losses = [0]*nb_epochs
   for fold in range(nb_folds):
     model.to(device)
 
@@ -183,14 +185,14 @@ def run_best_model_demon(mnist_train, mnist_test, model, config, device):
     
     for epoch in range(nb_epochs):
       train_demon(model, train_loader, criterion, optimizer, device, config["view_every"])
-      acc = test_demon(model, test_loader, device)
+      acc,loss = test_demon(model, test_loader, device,criterion)
 
       accs[epoch] += acc
-
+      losses[epoch] += loss
       print(f"Epoch {epoch} - accuracy: {acc:.4}")
 
   for i in range(len(accs)):
     accs[i] /= nb_folds
 
   print(f"----- {((time.time() - start_time)/60):.4} minutes")
-  return accs
+  return accs,losses,((time.time() - start_time)/60)
