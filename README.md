@@ -25,7 +25,7 @@ To run this project we took advantage of Google Colab's GPUs. To implement the p
 - `SGDhypertuning.ipynb`: notebook that finds the best parameters per model for SGD based models (SGD, SGDM, SGD-Nesterov).
 - `model.py`: script containing the definition of the neural network, and the function to reset its weights. 
 - `helpers.py`: script containing all the helper functions we will need to find the hyperparameters and run the K-Fold Cross-Validation.
-- `averaging.py`: contains the result from doing 3 runs.
+- `averaging.py`: contains the resultS from doing 3 runs.
 - YellowFin: folder containing the files to use the YellowFin optimizer.
   - `yellowfin.py`: script were we define the YFOptimizer.
   - `helpers_yellowfin.py`: contains the helper functions to run the K-Fold Cross-Validation and find the hyperparameters for this model.
