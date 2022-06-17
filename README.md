@@ -22,6 +22,7 @@ To run this project we took advantage of Google Colab's GPUs. To implement the p
 ### Project's Structure
 - `main.ipynb`: notebook that runs each model with their respectives hyperparameters and plots the accuracies evolution per epoch. 
 - `hypertuning.ipynb`: notebook that finds the best parameters per model. 
+- `SGDhypertuning.ipynb`: notebook that finds the best parameters per model for SGD based models (SGD, SGDM, SGD-Nesterov).
 - `model.py`: script containing the definition of the neural network, and the function to reset its weights. 
 - `helpers.py`: script containing all the helper functions we will need to find the hyperparameters and run the K-Fold Cross-Validation.
 - YellowFin: folder containing the files to use the YellowFin optimizer.
